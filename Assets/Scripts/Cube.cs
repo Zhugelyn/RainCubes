@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
@@ -7,25 +8,32 @@ public class Cube : MonoBehaviour, IInitialized
     private float _hueMax = 1;
     private int _minLifetime = 2;
     private int _maxLifetime = 5;
-    private bool _isDeactivated;
     private Color _defaultColor = Color.red;
 
-    private SpawnerCube _spawner;
+    private bool _isDeactivated;
+    private bool _isColorChanged;
 
-    public void Init(MonoBehaviour spawner)
+    private MeshRenderer _meshRenderer;
+
+    public event Action<Cube> Deactivation;
+
+    public void Init()
     {
-        GetComponent<MeshRenderer>().material.color = _defaultColor;
+        _meshRenderer = GetComponent<MeshRenderer>();
+        _meshRenderer.material.color = _defaultColor;
 
-        _spawner = (SpawnerCube)spawner;
         _isDeactivated = false;
+        _isColorChanged = false;
     }
 
     public void ChangeColor()
     {
-        if (GetComponent<MeshRenderer>().material.color == _defaultColor)
+        if (_isColorChanged == false)
         {
-            var color = Random.ColorHSV(_hueMin, _hueMax);
-            GetComponent<MeshRenderer>().material.color = color;
+            var color = UnityEngine.Random.ColorHSV(_hueMin, _hueMax);
+            _meshRenderer.material.color = color;
+
+            _isColorChanged = true;
         }
     }
 
@@ -34,13 +42,14 @@ public class Cube : MonoBehaviour, IInitialized
         if (_isDeactivated)
             return;
 
-        var lifetime = Random.Range(_minLifetime, _maxLifetime);
+        var lifetime = UnityEngine.Random.Range(_minLifetime, _maxLifetime);
         Invoke("Deactivate", lifetime);
         _isDeactivated = true;
     }
 
     private void Deactivate()
     {
-        _spawner.ReturnPool(this);
+        Deactivation?.Invoke(this);
+        Debug.Log("1");
     }
 }

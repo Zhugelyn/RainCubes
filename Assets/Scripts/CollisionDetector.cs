@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Cube))]
-public class CubeCollision : MonoBehaviour
+public class CollisionDetector : MonoBehaviour
 {
     private void OnCollisionEnter(Collision collision)
     {

@@ -21,12 +21,12 @@ public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IIniti
 
     public virtual void ActionOnGet(T obj)
     {
-        obj.Init(this);
+        obj.Init();
         obj.transform.position = GetSpawnPosition();
         obj.gameObject.SetActive(true);
     }
 
-    public virtual void ReturnPool(T obj)
+    public virtual void ReturnToPool(T obj)
     {
         Pool.Release(obj);
     }
