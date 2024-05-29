@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
-public class Cube : MonoBehaviour, IInitialized
+public class Cube : MonoBehaviour, IInitialized, IDeactivable<Cube>
 { 
     private float _hueMin = 0;
     private float _hueMax = 1;
@@ -37,19 +38,32 @@ public class Cube : MonoBehaviour, IInitialized
         }
     }
 
-    public void StartDeactivationCountdown()
+    public void StartDeactivation()
     {
         if (_isDeactivated)
             return;
 
-        var lifetime = UnityEngine.Random.Range(_minLifetime, _maxLifetime);
-        Invoke("Deactivate", lifetime);
         _isDeactivated = true;
+
+        StartCoroutine(Deactivate());
     }
 
-    private void Deactivate()
+    private IEnumerator Deactivate()
     {
-        Deactivation?.Invoke(this);
-        Debug.Log("1");
+        int counter = 0;
+        float delay = 1f;
+        var wait = new WaitForSeconds(delay);
+        var lifetime = UnityEngine.Random.Range(_minLifetime, _maxLifetime);
+
+
+        while (enabled)
+        {
+            if (counter >= lifetime)
+                Deactivation?.Invoke(this);
+
+            counter++;
+
+            yield return wait;
+        }
     }
 }

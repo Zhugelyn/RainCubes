@@ -4,17 +4,6 @@ using UnityEngine;
 public class SpawnerCube : Spawner<Cube>
 {
     [SerializeField] private float _delay;
-    [SerializeField] private Cube _cube;
-
-    private void OnEnable()
-    {
-        _cube.Deactivation += ReturnCube;
-    }
-
-    private void OnDisable()
-    {
-        _cube.Deactivation -= ReturnCube;
-    }
 
     private void Start()
     {
@@ -31,11 +20,5 @@ public class SpawnerCube : Spawner<Cube>
 
             yield return wait;
         }
-    }
-
-    private void ReturnCube(Cube cube)
-    {
-        ReturnToPool(cube);
-        Debug.Log("Release");
     }
 }

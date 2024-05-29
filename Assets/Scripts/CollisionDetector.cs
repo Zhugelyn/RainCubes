@@ -9,7 +9,7 @@ public class CollisionDetector : MonoBehaviour
         {
             var cube = GetComponent<Cube>();
             cube.ChangeColor();
-            cube.StartDeactivationCountdown();
+            cube.StartDeactivation();
         }
     }
 }

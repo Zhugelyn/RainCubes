@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IInitialized
+public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IInitialized, IDeactivable<T>
 {
     [SerializeField] private T _prefab;
     [SerializeField] private SpawnZone _spawnZone;
@@ -24,10 +24,12 @@ public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IIniti
         obj.Init();
         obj.transform.position = GetSpawnPosition();
         obj.gameObject.SetActive(true);
+        obj.Deactivation += ReturnToPool;
     }
 
     public virtual void ReturnToPool(T obj)
     {
+        obj.Deactivation -= ReturnToPool;
         Pool.Release(obj);
     }
 
