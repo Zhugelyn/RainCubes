@@ -1,50 +1,42 @@
+using System;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public abstract class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IInitialized, IDeactivable<T>
 {
     [SerializeField] private T _prefab;
-    [SerializeField] private SpawnZone _spawnZone;
-    [SerializeField] private float _heightSpawn;
     [SerializeField] private int _poolMaxSize;
 
     protected ObjectPool<T> Pool;
+
+    public event Action<T> Pooling;
+    public event Action<T, ObjectPool<T>> ObjectPoolChanged;
 
     private void Awake()
     {
         Pool = new ObjectPool<T>(
         createFunc: () => Instantiate(_prefab),
         actionOnGet: (obj) => ActionOnGet(obj),
-        actionOnRelease: (obj) => obj.gameObject.SetActive(false),
+        actionOnRelease: (obj) => OnRelease(obj),
         maxSize: _poolMaxSize);
     }
 
     public virtual void ActionOnGet(T obj)
     {
-        obj.Init();
-        obj.transform.position = GetSpawnPosition();
-        obj.gameObject.SetActive(true);
+        ObjectPoolChanged?.Invoke(obj, Pool);
         obj.Deactivation += ReturnToPool;
     }
 
     public virtual void ReturnToPool(T obj)
     {
         obj.Deactivation -= ReturnToPool;
+        Pooling?.Invoke(obj);
         Pool.Release(obj);
     }
 
-    private Vector3 GetSpawnPosition()
+    public virtual void OnRelease(T obj)
     {
-        var collider = _spawnZone.gameObject.GetComponent<BoxCollider>();
-        var maxPosX = _spawnZone.transform.position.x + collider.size.x / 2;
-        var minPosX = _spawnZone.transform.position.x - collider.size.x / 2;
-        var maxPosZ = _spawnZone.transform.position.z + collider.size.z / 2;
-        var minPosZ = _spawnZone.transform.position.z - collider.size.z / 2;
-
-        var posX = Random.Range(minPosX, maxPosX);
-        var posY = _spawnZone.transform.position.y + _heightSpawn;
-        var posZ = Random.Range(minPosZ, maxPosZ);
-
-        return new Vector3(posX, posY, posZ);
+        obj.gameObject.SetActive(false);
+        ObjectPoolChanged?.Invoke(obj, Pool);
     }
 }

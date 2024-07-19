@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
 public class Cube : MonoBehaviour, IInitialized, IDeactivable<Cube>
-{ 
+{
     private float _hueMin = 0;
     private float _hueMax = 1;
     private int _minLifetime = 2;
@@ -18,10 +18,11 @@ public class Cube : MonoBehaviour, IInitialized, IDeactivable<Cube>
 
     public event Action<Cube> Deactivation;
 
-    public void Init()
+    public void Init(Vector3 position)
     {
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshRenderer.material.color = _defaultColor;
+        transform.position = position;
 
         _isDeactivated = false;
         _isColorChanged = false;
