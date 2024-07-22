@@ -24,7 +24,7 @@ public class PoolCounterView<T> : MonoBehaviour where T : MonoBehaviour, IInitia
 
     public virtual string SetDisplayTemplate(T obj, ObjectPool<T> pool)
     {
-        return $"Всего {obj.name} в пуле {pool.CountAll}\n " +
+        return $"Всего {obj.name} в пуле {pool.CountAll}\n" +
             $"Всего активных на сцене {pool.CountActive}";
     }
 }

@@ -2,8 +2,15 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class Bomb : MonoBehaviour, IInitialized, IDeactivable<Bomb>
+public class Bomb : MonoBehaviour, IInitialized, IDeactivable<Bomb>, IExplodable
 {
+    [SerializeField] private Explosion _explosion;
+    [SerializeField] private float _explosionRadius;
+    [SerializeField] private float _explosionForce;
+
+    [SerializeField] private ParticleSystem _particleSystem;
+    [SerializeField] private AudioClip _clip;
+
     private int _minLifetime = 2;
     private int _maxLifetime = 5;
 
@@ -38,11 +45,24 @@ public class Bomb : MonoBehaviour, IInitialized, IDeactivable<Bomb>
         while (enabled)
         {
             if (counter >= lifetime)
+            {
+                Explode();
                 Deactivation?.Invoke(this);
+            }
 
             counter++;
 
             yield return wait;
         }
+    }
+
+    public void Explode()
+    {
+        var explosionSystem = Instantiate(_particleSystem, transform.position, Quaternion.identity);
+        explosionSystem.Play();
+
+        _explosion.Explode(transform.position, _explosionRadius, _explosionForce);
+        AudioSource.PlayClipAtPoint(_clip, transform.position);
+        Destroy(explosionSystem);
     }
 }

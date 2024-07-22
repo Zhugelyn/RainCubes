@@ -18,6 +18,6 @@ public class SpawnerBomb : Spawner<Bomb>
     {
         var bomb = Pool.Get();
         bomb.Init(cube.transform.position);
-        cube.gameObject.SetActive(true);
+        bomb.gameObject.SetActive(true);
     }
 }
